@@ -1,0 +1,27 @@
+
+version: 2
+
+macros:
+  - name: r__cor_schema
+    description: macro to create or replace a schema in a database 
+    arguments:
+      - name: schema_name
+        description: name of the schema to create or replace
+        type: string
+      - name: database_name
+        description: name of the database to create or replace the schema in
+        type: string
+
+models:
+  - name: customer
+    description: "tpch customer table"
+    columns:
+      - name: C_CUSTKEY
+        description: "The primary key for this table"
+        tests:
+          - unique
+          - not_null
+      - name: C_NATIONKEY
+        description: "Foreign key to nation table "
+        tests:
+          - not_null

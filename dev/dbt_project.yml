@@ -12,7 +12,7 @@ profile: 'dev'
 # These configurations specify where dbt should look for different types of files.
 # The `model-paths` config, for example, states that models in this project can be
 # found in the "models/" directory. You probably won't need to change these!
-model-paths: ["models"]
+model-paths: ["models","dbt_sources"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
 seed-paths: ["seeds"]
@@ -22,7 +22,14 @@ snapshot-paths: ["snapshots"]
 clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
+  - "logs"
 
+
+on-run-start:
+  - "{{ log('Starting dbt run at ' ~ run_started_at, info=True) }}"
+
+on-run-end:
+  - "{{ log('Finished dbt run at ' ~ run_started_at, info=True) }}"
 
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
@@ -32,6 +39,8 @@ clean-targets:         # directories to be removed by `dbt clean`
 # files using the `{{ config(...) }}` macro.
 models:
   dev:
-    # Config indicated by + and applies to all files under models/example/
-    example:
-      +materialized: view
+    # + schema _dev # dbt creates custom schema by using profiles schema parameter and adding underscore so profiles.schema_thisparameter
+    tpch_queries:
+      materialized: view
+    tpch_views:
+      mateiralized: view
