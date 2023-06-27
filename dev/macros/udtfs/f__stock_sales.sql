@@ -1,4 +1,7 @@
-create or replace function stock_sale_sum(symbol varchar, quantity number, price number(10,2))
+{% macro f__stock_sales() %}
+    {% set query -%}
+--- 
+create or replace function f__stock_sales(symbol varchar, quantity number, price number(10,2))
 returns table (symbol varchar, total number(10,2))
 language python
 runtime_version=3.8
@@ -18,10 +21,7 @@ class StockSaleSum:
     def end_partition(self):
       yield (self._symbol, self._cost_total)
 $$;
-
-
-
-
-select stock_sale_sum.symbol, total
-  from stock_sales, table(stock_sale_sum(symbol, quantity, price) over (partition by symbol))
-  ;
+--- 
+    {%- endset -%}
+    {{ run_query(query) }}
+{% endmacro %}

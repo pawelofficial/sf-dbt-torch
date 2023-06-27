@@ -31,6 +31,9 @@ on-run-start:
 on-run-end:
   - "{{ log('Finished dbt run at ' ~ run_started_at, info=True) }}"
 
+seeds:
+  +quote_columns: false
+
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
 

@@ -1,20 +1,4 @@
-create or replace function dev.dev.bs4_extract(s varchar,element varchar,attribute varchar)
-returns varchar
-language python
-runtime_version = '3.8'
-handler = 'bs4_extract'
-PACKAGES =('bs4')
-as
-$$
-from bs4 import BeautifulSoup
-def bs4_extract(s,element='a',attribute='href'):
-    soup = BeautifulSoup(s)
-    a_tags = soup.find_all(element)
-    tags=[tag.get(attribute) for tag in a_tags]
-    return f"{tags}"
-$$;
-
-
+{{ config(materialized='table') }}
 with cte as ( 
     select '<html>
 <head>
@@ -36,7 +20,11 @@ with cte as (
     </div>
 </body>
 </html>
-' as example
+' as html_column
 )
-select dev.dev.bs4_extract(example,'a','href'),dev.dev.bs4_extract(example,'img','src')
+
+select 
+{{ use_fun('f__bs4_extract', ['html_column'], ['a', 'href']) }}  as bs4_href
+,{{ use_fun('f__bs4_extract', ['html_column'], ['img', 'src']) }}  as bs4_img
 from cte
+
