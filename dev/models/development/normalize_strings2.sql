@@ -1,6 +1,6 @@
 
 {% set sql_statement %}
-    select array_agg(distinct origin) ar1, array_agg(distinct foobar) ar2 
+    select array_agg(distinct origin) origin, array_agg(distinct foobar) foobar 
     from demo__automobiles
 {% endset %}
 {%- set hot_key_columns=dbt_utils.get_query_results_as_dict(sql_statement) -%}
@@ -10,36 +10,30 @@
         select distinct origin     from demo__automobiles
     {%- endcall -%}
 
-    {%- set value_list = load_result('kocham_dbt') -%}
+    {%- set value_list = load_result('kocham_dbt') -%}                 -- one way of making lists 
     {%- set values = value_list['data'] | map(attribute=0) | list %}
 
 with
-cte2 as ( 
+cte1 as ( 
+select 
+{% for key, val in hot_key_columns.items() %} 
+    array_agg( distinct {{ key }} ) as AR_{{ key }} {% if not loop.last %},{% endif %}
+{% endfor %} 
+from {{ ref('demo__automobiles') }}
+)
+,cte2 as ( 
     select 
-{% for col in values %} 
-    {{ col }}  as first_list 
-{% endfor %}
 
 {% for key,val  in hot_key_columns.items() %} 
 
     {%- set another_list = string_to_list (val[0]) -%}
-    {{ another_list }} 
 
     {% for l in another_list %} 
-        {{ l }}   as another_list
-    {% endfor %} 
-
-    {%- set yet_another_list = val[0].replace(']','').replace('[','').replace('"','').replace(', ',',').replace("'",'').replace('\n','').split(sep=',', maxsplit=-1) -%}
-
-    {% for l in yet_another_list %} 
-        {{ l }}  as yet_another_list
-    {% endfor %} 
-
-
-
+        (array_position( {{ key }} :: variant, AR_{{key}} ) = {{ loop.index -1 }} ) ::int as is_{{ key }}_{{ l | upper }} {%- if not loop.last %},{% endif -%}
+    {% endfor %}  {%- if not loop.last %},{% endif -%}
 {% endfor %}
 
 
 
-from {{ ref('demo__automobiles') }} 
+from {{ ref('demo__automobiles') }} cross join cte1 
 ) select * from cte2 
