@@ -39,3 +39,14 @@ objects
     - udf__pytorch_evaluate(array)  # evaluates input row 
     - sp__pytorch_train(table)      # trains pytorch model 
     - normalize_table()             # normalizes table into logits 
+
+
+
+# how tos: 
+
+1. generate docs:
+    $ dbt docs generate                 # generate docs 
+    $ dbt docs serve [ --port 8080]     # show docs on localhost:8080
+
+2. train pytorch model
+    2.1 $ dbt seed --select seed_demo_automobiles   # creates table on SF used for demo 

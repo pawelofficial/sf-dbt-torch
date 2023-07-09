@@ -9,6 +9,14 @@ config-version: 2
 # This setting configures which "profile" dbt uses for this project.
 profile: 'dev'
 
+# variables 
+vars:
+  demo_schema: 'DEV'
+
+packages:
+  - package: dbt-labs/dbt_utils
+    version: 1.1.1
+
 # These configurations specify where dbt should look for different types of files.
 # The `model-paths` config, for example, states that models in this project can be
 # found in the "models/" directory. You probably won't need to change these!
@@ -42,8 +50,8 @@ seeds:
 # files using the `{{ config(...) }}` macro.
 models:
   dev:
-    # + schema _dev # dbt creates custom schema by using profiles schema parameter and adding underscore so profiles.schema_thisparameter
-    tpch_queries:
+    views:
       materialized: view
-    tpch_views:
-      mateiralized: view
+    tables:
+      materialized: table
+

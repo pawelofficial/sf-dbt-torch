@@ -1,0 +1,1 @@
+select *exclude(origin,name) from {{ref('demo__automobiles') }}
